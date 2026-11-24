@@ -1,3 +1,4 @@
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { lingui } from "@lingui/vite-plugin";
 import { buildIdAt } from "@rakazo/contracts/client-build";
@@ -62,6 +63,23 @@ export default defineConfig(({ command, mode }) => {
         apply: "build",
         generateBundle() {
           this.emitFile({ type: "asset", fileName: "build-id", source: `${buildId}\n` });
+        },
+      },
+      {
+        // Bots read these through the docs index in their instructions, so this server answers
+        // with the docs that match its own code. Top-level files only; translations stay out.
+        name: "rakazo-docs",
+        apply: "build",
+        generateBundle() {
+          const docs = path.resolve(import.meta.dirname, "../../docs");
+          if (!existsSync(docs)) return;
+          for (const file of readdirSync(docs).filter((name) => name.endsWith(".md"))) {
+            this.emitFile({
+              type: "asset",
+              fileName: `docs/${file}`,
+              source: readFileSync(path.join(docs, file)),
+            });
+          }
         },
       },
       react(),

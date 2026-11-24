@@ -351,7 +351,7 @@ export const computerTools: ConnectorTool[] = [
   {
     name: "request_takeover",
     description:
-      "Ask the user to take over the computer screen for CAPTCHA, payment, passkeys, or other protected input request_secret cannot take. Never ask the user to paste protected values in chat.",
+      "Try to resolve CAPTCHA first; if that fails, or for payment, passkeys or other protected input request_secret cannot take, ask the user to take over the computer screen. Never ask the user to paste protected values in chat.",
     inputSchema: {
       type: "object",
       properties: { reason: { type: "string" } },

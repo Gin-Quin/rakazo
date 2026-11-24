@@ -1,40 +1,55 @@
+import { isIP } from "node:net";
 import { buildSkillMd } from "@rakazo/core";
 
+/**
+ * Where the docs bots read live. This server publishes the repository's docs under its own
+ * origin (the web build copies docs/*.md to /docs), so a bot reads the version that matches the
+ * running code. A local or plain-http origin cannot be fetched by a bot, so those fall back to
+ * the project's public site.
+ */
+function docsOrigin(env: NodeJS.ProcessEnv = process.env): string | undefined {
+  try {
+    const origin = new URL(env.WEB_ORIGIN ?? "");
+    const local =
+      origin.hostname === "localhost" || isIP(origin.hostname.replace(/^\[|\]$/g, "")) !== 0;
+    return origin.protocol === "https:" && !local ? origin.origin : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+const DOCS_ORIGIN = docsOrigin();
+
+function docUrl(name: string): string {
+  if (DOCS_ORIGIN) return `${DOCS_ORIGIN}/docs/${name}.md`;
+  return name === "getting-started"
+    ? "https://rakazo.com/docs.md"
+    : `https://rakazo.com/docs/${name}.md`;
+}
+
 const RAKAZO_DOCS: ReadonlyArray<readonly [topics: string, url: string]> = [
-  ["Getting started, first bot, what Rakazo does", "https://rakazo.com/docs.md"],
-  [
-    "Creating bots, chatting, bot settings, sidebar, search",
-    "https://rakazo.com/docs/bots-and-chats.md",
-  ],
-  [
-    "Importing an OpenClaw, Hermes, Grok Bot or ChatGPT agent",
-    "https://rakazo.com/docs/import-an-agent.md",
-  ],
-  [
-    "Connecting apps and integrations (Gmail, GitHub, MCP tools)",
-    "https://rakazo.com/docs/integrations.md",
-  ],
-  ["Slack, Telegram, WhatsApp and other chat apps", "https://rakazo.com/docs/messaging-apps.md"],
-  ["Routines, schedules and triggers", "https://rakazo.com/docs/routines.md"],
-  ["The bot's computer, files, using your own computer", "https://rakazo.com/docs/computer.md"],
-  ["Memory", "https://rakazo.com/docs/memory.md"],
-  ["Skills", "https://rakazo.com/docs/skills.md"],
-  ["Approvals, Allow and Block lists", "https://rakazo.com/docs/approvals.md"],
-  ["Group chats, bots working together, subagents", "https://rakazo.com/docs/groups.md"],
-  ["Voice, calls, spoken replies", "https://rakazo.com/docs/voice-and-calls.md"],
-  ["Models, providers, API keys, fallbacks, usage", "https://rakazo.com/docs/models.md"],
-  ["Spaces", "https://rakazo.com/docs/spaces.md"],
-  ["Saved credentials and website logins", "https://rakazo.com/docs/bot-secrets.md"],
-  [
-    "Account, preferences, data export, credits, plans, billing",
-    "https://rakazo.com/docs/account.md",
-  ],
-  ["Desktop app", "https://rakazo.com/docs/desktop-app.md"],
-  ["Mobile app", "https://rakazo.com/docs/mobile-app.md"],
-  ["Bots that create and manage bots", "https://rakazo.com/docs/fleet-management.md"],
-  ["Building a plugin", "https://rakazo.com/docs/build-a-plugin.md"],
-  ["Self-hosting", "https://rakazo.com/docs/self-host.md"],
-  ["Self-hosted server configuration", "https://rakazo.com/docs/self-host-configuration.md"],
+  ["Getting started, first bot, what Rakazo does", docUrl("getting-started")],
+  ["Creating bots, chatting, bot settings, sidebar, search", docUrl("bots-and-chats")],
+  ["Importing an OpenClaw, Hermes, Grok Bot or ChatGPT agent", docUrl("import-an-agent")],
+  ["Connecting apps and integrations (Gmail, GitHub, MCP tools)", docUrl("integrations")],
+  ["Slack, Telegram, WhatsApp and other chat apps", docUrl("messaging-apps")],
+  ["Routines, schedules and triggers", docUrl("routines")],
+  ["The bot's computer, files, using your own computer", docUrl("computer")],
+  ["Memory", docUrl("memory")],
+  ["Skills", docUrl("skills")],
+  ["Approvals, Allow and Block lists", docUrl("approvals")],
+  ["Group chats, bots working together, subagents", docUrl("groups")],
+  ["Voice, calls, spoken replies", docUrl("voice-and-calls")],
+  ["Models, providers, API keys, fallbacks, usage", docUrl("models")],
+  ["Spaces", docUrl("spaces")],
+  ["Saved credentials and website logins", docUrl("bot-secrets")],
+  ["Account, preferences, data export, credits, plans, billing", docUrl("account")],
+  ["Desktop app", docUrl("desktop-app")],
+  ["Mobile app", docUrl("mobile-app")],
+  ["Bots that create and manage bots", docUrl("fleet-management")],
+  ["Building a plugin", docUrl("build-a-plugin")],
+  ["Self-hosting", docUrl("self-host")],
+  ["Self-hosted server configuration", docUrl("self-host-configuration")],
 ];
 
 /** Fixed URLs, so fetching one can't carry anything out of a run. */
