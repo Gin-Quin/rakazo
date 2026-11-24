@@ -1,0 +1,12 @@
+#!/bin/sh
+# Antigravity has no settings key for skipping permission prompts, only a flag, so a bot's
+# computer starts agy with it. A computer is the sandbox that makes that reasonable. Subcommands
+# (sign-in, models, mcp, update) take no such flag and run as they are. Set RAKAZO_AGENT_SAFE=1
+# to keep agy asking.
+real=/usr/local/lib/rakazo/agy
+if [ "${RAKAZO_AGENT_SAFE:-}" = 1 ]; then exec "$real" "$@"; fi
+case "${1:-}" in
+  acp | agent | agents | changelog | help | install | mcp | mic-serve | models | plugin | plugins | remote-control | update | -h | --help | -v | --version)
+    exec "$real" "$@" ;;
+esac
+exec "$real" --dangerously-skip-permissions "$@"

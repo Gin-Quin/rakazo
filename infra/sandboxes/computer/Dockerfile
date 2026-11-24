@@ -187,6 +187,17 @@ RUN set -eux; \
 COPY --chmod=755 install-agent-browser.sh /tmp/install-agent-browser.sh
 RUN /tmp/install-agent-browser.sh /usr/local/bin && rm /tmp/install-agent-browser.sh \
   && mkdir -p /usr/local/lib/rakazo
+# Coding agent CLIs a bot can run in its computer (Claude Code, Codex, Antigravity), each from the
+# vendor's own release. They start without permission prompts: the computer is the sandbox. Sign-in
+# happens once inside the computer and lives in the home volume; none is baked into the image.
+COPY --chmod=755 install-coding-agents.sh /tmp/install-coding-agents.sh
+RUN /tmp/install-coding-agents.sh /usr/local/bin /usr/local/lib/rakazo && rm /tmp/install-coding-agents.sh
+# agy only takes a flag for this, so /usr/local/bin/agy is a wrapper around the real binary.
+COPY --chmod=755 rakazo-agy /usr/local/bin/agy
+# COPY --chmod would give the folders it creates the file's mode, with no search bit.
+RUN mkdir -p -m 755 /etc/claude-code /etc/codex
+COPY --chmod=644 claude-managed-settings.json /etc/claude-code/managed-settings.json
+COPY --chmod=644 codex-config.toml /etc/codex/config.toml
 ENV DISPLAY=:1
 ENV HOME=/home/rakazo
 # Keep UTF-8 explicit (an empty LANG broke non-ASCII file handling in the

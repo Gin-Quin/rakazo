@@ -169,6 +169,11 @@ export function dockerComputerToolInstruction(
       "Python 3 is installed as `python3`; if `python` is not found, retry with `python3`.",
     );
   }
+  if (shellOffered) {
+    parts.push(
+      "The coding agent CLIs `claude`, `codex` and `agy` (Antigravity) are installed and start without permission prompts, since this computer is the sandbox. Run them headless in the project folder (`claude -p`, `codex exec`, `agy -p`), as background work. The user signs each in once inside this computer: when one reports it is not signed in, run its login (`claude auth login`, `codex login --device-auth`, `agy`) and tell the user the code or URL.",
+    );
+  }
   if (navigate && act) {
     parts.push(
       'To authenticate `gh`, run `LOG=$(mktemp /tmp/gh-login.XXXXXX); nohup script -qec \'gh auth login --hostname github.com --web --git-protocol https\' "$LOG" >/dev/null 2>&1 & echo "$LOG"` — keep that printed path, read the one-time code from it, browser_navigate to https://github.com/login/device, and browser_act the code. Completing that page authorizes the CLI OAuth app and stores the credential under the persistent home; it does not by itself create a Chromium github.com session.',

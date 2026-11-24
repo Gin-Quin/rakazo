@@ -1,0 +1,4 @@
+# A bot's computer is the sandbox, so Codex neither asks nor adds a sandbox of its own: its
+# namespace sandbox cannot start inside a container anyway.
+approval_policy = "never"
+sandbox_mode = "danger-full-access"

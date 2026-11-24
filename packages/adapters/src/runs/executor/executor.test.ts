@@ -1945,6 +1945,8 @@ describe("dockerComputerToolInstruction", () => {
     expect(dockerComputerToolInstruction("docker")).toContain("without sudo");
     expect(dockerComputerToolInstruction("docker")).toContain("`python3`");
     expect(dockerComputerToolInstruction("docker", new Set(["shell"]))).not.toContain("`python3`");
+    expect(dockerComputerToolInstruction("docker")).toContain("`claude`, `codex` and `agy`");
+    expect(dockerComputerToolInstruction("docker", new Set(["shell"]))).not.toContain("`agy`");
     expect(dockerComputerToolInstruction("desktop")).toBeUndefined();
     expect(dockerComputerToolInstruction("e2b")).toBeUndefined();
   });
